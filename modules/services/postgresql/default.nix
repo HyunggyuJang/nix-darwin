@@ -342,7 +342,7 @@ in
             ${pkgs.coreutils}/bin/rm -f ${cfg.dataDir}/*.conf
 
             # Initialise the database.
-            ${postgresql}/bin/initdb -U ${cfg.superUser} ${concatStringsSep " " cfg.initdbArgs}
+            ${postgresql}/bin/initdb -U ${cfg.superUser} --pgdata ${cfg.dataDir} ${concatStringsSep " " cfg.initdbArgs}
 
             # See postStart!
             # FIXME: implement postStart
@@ -355,14 +355,11 @@ in
               "${cfg.dataDir}/recovery.conf"
           ''}
 
-          exec ${postgresql}/bin/postgres
+          exec ${postgresql}/bin/postgres -D ${cfg.dataDir}
         '';
 
         serviceConfig.KeepAlive = true;
         serviceConfig.RunAtLoad = true;
-        serviceConfig.EnvironmentVariables = {
-          PGDATA = cfg.dataDir;
-        };
       };
 
   };
